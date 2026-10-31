@@ -5,8 +5,6 @@ import {
   Car,
   Activity,
   ShieldCheck,
-  CheckCircle,
-  Clock,
   ArrowRight,
   TrendingUp,
   MapPin,
@@ -18,6 +16,12 @@ export default function OverviewPage({ data, onNavigate, onTriggerCycle, isExecu
     cityRiskScore: 74,
     riskLevel: 'High',
     activeIncidentsCount: 4,
+    activeEmergencies: [
+      { id: "EMG-01", title: "Subway Submergence & Waterlogging", location: "Narendra Nagar Railway Underpass", severity: "Critical", division: "URBAN", status: "Response Underway" },
+      { id: "EMG-02", title: "Sludge & Drainage Congestion", location: "Manish Nagar Subway", severity: "High", division: "URBAN", status: "Monitoring" },
+      { id: "EMG-03", title: "Citrus Orchard Inundation Threat", location: "Hingna & Katol Talukas", severity: "High", division: "RURAL", status: "Advisory Dispatched" },
+      { id: "EMG-04", title: "Arterial Transit Gridlock", location: "Wardha Road Corridor", severity: "High", division: "URBAN", status: "Diversion Recommended" }
+    ],
     weatherSummary: {
       condition: 'Severe Thunderstorm & Convective Downpour',
       rainfallRateMmHr: 62.5,
@@ -36,32 +40,38 @@ export default function OverviewPage({ data, onNavigate, onTriggerCycle, isExecu
       healthServices: 'Alert (Ambulances Rerouted via Chhatrapati Flyover)',
       agriculture: 'Rural Inundation Advisory Dispatched (Hingna/Saoner)'
     },
+    highRiskZones: [
+      { name: "Narendra Nagar Underpass", type: "Subway Flood", risk: "Critical (3.8 ft)" },
+      { name: "Manish Nagar Flyover Subway", type: "Water Accumulation", risk: "High (2.1 ft)" },
+      { name: "Ambazari Lake Spillway", type: "Conduit Ingress", risk: "Monitored (92% Cap)" },
+      { name: "Sitabuldi Interchange", type: "Bus Bay Ponding", risk: "Moderate (1.2 ft)" }
+    ],
     pendingApprovalsCount: 1,
     recentAgentActivity: []
   };
 
   return (
     <div className="space-y-6">
-      {/* Banner / Header Bar */}
-      <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 p-5 rounded-2xl bg-gradient-to-r from-navy-900 via-navy-850 to-navy-900 border border-cyan-500/30 shadow-xl">
+      {/* Top Banner */}
+      <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm flex flex-col md:flex-row md:items-center justify-between gap-4">
         <div>
           <div className="flex items-center gap-2">
-            <h1 className="text-xl md:text-2xl font-extrabold text-white tracking-tight">
+            <h1 className="text-xl md:text-2xl font-extrabold text-gray-900 tracking-tight">
               Nagpur Emergency Command Overview
             </h1>
-            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-rose-500/20 text-rose-300 border border-rose-500/40 animate-pulse">
-              ACTIVE MONSOON SURGE
+            <span className="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-100 text-amber-800 border border-amber-300">
+              ACTIVE MONSOON ALERT
             </span>
           </div>
-          <p className="text-slate-400 text-xs md:text-sm mt-1">
+          <p className="text-gray-500 text-xs md:text-sm mt-1">
             Synthesized multi-agent intelligence across Wardha Road basin, Sitabuldi corridor, and peri-urban Vidarbha.
           </p>
         </div>
 
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
           <button
             onClick={() => onNavigate('digital-twin')}
-            className="px-4 py-2 rounded-xl bg-gradient-to-r from-cyan-500 to-teal-500 hover:from-cyan-400 hover:to-teal-400 text-navy-950 font-bold text-xs shadow-lg shadow-cyan-500/20 flex items-center gap-2 transition-all transform hover:-translate-y-0.5"
+            className="px-4 py-2 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm flex items-center gap-1.5 transition-all"
           >
             <span>Run Digital Twin Simulation</span>
             <ArrowRight className="w-4 h-4" />
@@ -69,260 +79,229 @@ export default function OverviewPage({ data, onNavigate, onTriggerCycle, isExecu
           <button
             onClick={onTriggerCycle}
             disabled={isExecutingCycle}
-            className="px-4 py-2 rounded-xl bg-navy-800 hover:bg-navy-750 text-cyan-300 border border-cyan-500/30 font-semibold text-xs flex items-center gap-2 transition-all"
+            className="px-4 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-800 border border-gray-300 font-semibold text-xs flex items-center gap-1.5 transition-all"
           >
-            <Cpu className={`w-4 h-4 ${isExecutingCycle ? 'animate-spin' : ''}`} />
-            <span>{isExecutingCycle ? 'Agents Synchronizing...' : 'Trigger Agent Cycle'}</span>
+            <Cpu className={`w-4 h-4 text-amber-600 ${isExecutingCycle ? 'animate-spin' : ''}`} />
+            <span>{isExecutingCycle ? 'Synchronizing...' : 'Trigger Swarm Cycle'}</span>
           </button>
         </div>
       </div>
 
-      {/* Top 4 KPI Cards */}
+      {/* 4 KPI Cards */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
-        {/* City Risk Index */}
-        <div className="p-5 rounded-2xl bg-navy-900/90 border border-rose-500/30 shadow-lg relative overflow-hidden group hover:border-rose-500/60 transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-rose-500/10 rounded-full blur-2xl group-hover:bg-rose-500/20 transition-all" />
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-3">
+        {/* City Risk Score */}
+        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-amber-400 transition-all">
+          <div className="flex items-center justify-between text-gray-500 text-xs font-medium mb-2">
             <span>Overall City Risk Index</span>
-            <span className="p-1.5 rounded-lg bg-rose-500/10 text-rose-400">
+            <span className="p-1.5 rounded-lg bg-amber-50 text-amber-600">
               <AlertTriangle className="w-4 h-4" />
             </span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-rose-400 font-mono">
+            <span className="text-3xl font-extrabold text-amber-600 font-mono">
               {overview.cityRiskScore}
             </span>
-            <span className="text-sm font-semibold text-slate-400">/ 100</span>
-            <span className="ml-auto px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+            <span className="text-sm font-semibold text-gray-400">/ 100</span>
+            <span className="ml-auto px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
               {overview.riskLevel} Tier
             </span>
           </div>
-          <div className="mt-3 text-xs text-slate-400 flex items-center gap-1.5">
-            <TrendingUp className="w-3.5 h-3.5 text-rose-400" />
-            <span>Subway inundation +65mm/hr rain stress</span>
+          <div className="mt-2 text-xs text-gray-500 flex items-center gap-1">
+            <TrendingUp className="w-3.5 h-3.5 text-amber-600" />
+            <span>Subway depth +65mm/hr rain stress</span>
           </div>
         </div>
 
-        {/* Active Incidents */}
-        <div className="p-5 rounded-2xl bg-navy-900/90 border border-amber-500/30 shadow-lg relative overflow-hidden group hover:border-amber-500/60 transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-amber-500/10 rounded-full blur-2xl group-hover:bg-amber-500/20 transition-all" />
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-3">
-            <span>Active Incidents</span>
-            <span className="p-1.5 rounded-lg bg-amber-500/10 text-amber-400">
+        {/* Total Incidents & Emergencies */}
+        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-amber-400 transition-all">
+          <div className="flex items-center justify-between text-gray-500 text-xs font-medium mb-2">
+            <span>Active Emergencies</span>
+            <span className="p-1.5 rounded-lg bg-red-50 text-red-600">
               <Activity className="w-4 h-4" />
             </span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-amber-400 font-mono">
+            <span className="text-3xl font-extrabold text-gray-900 font-mono">
               {overview.activeIncidentsCount}
             </span>
-            <span className="text-sm font-semibold text-slate-400">Hotspots</span>
-            <span className="ml-auto px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            <span className="text-sm font-semibold text-gray-400">Hotspots</span>
+            <span className="ml-auto px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200">
               1 Critical
             </span>
           </div>
-          <div className="mt-3 text-xs text-slate-400 truncate">
+          <div className="mt-2 text-xs text-gray-500 truncate">
             Primary: Narendra Nagar Railway Underpass
           </div>
         </div>
 
-        {/* Doppler Weather Feed */}
-        <div className="p-5 rounded-2xl bg-navy-900/90 border border-cyan-500/30 shadow-lg relative overflow-hidden group hover:border-cyan-500/60 transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-cyan-500/10 rounded-full blur-2xl group-hover:bg-cyan-500/20 transition-all" />
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-3">
+        {/* Weather Warning */}
+        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-amber-400 transition-all">
+          <div className="flex items-center justify-between text-gray-500 text-xs font-medium mb-2">
             <span>IMD Rain Intensity</span>
-            <span className="p-1.5 rounded-lg bg-cyan-500/10 text-cyan-400">
+            <span className="p-1.5 rounded-lg bg-blue-50 text-blue-600">
               <CloudRain className="w-4 h-4" />
             </span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-cyan-400 font-mono">
+            <span className="text-3xl font-extrabold text-gray-900 font-mono">
               {overview.weatherSummary?.rainfallRateMmHr || 62.5}
             </span>
-            <span className="text-sm font-semibold text-slate-400">mm / hr</span>
-            <span className="ml-auto px-2 py-0.5 rounded text-[11px] font-bold bg-amber-500/20 text-amber-300 border border-amber-500/30">
+            <span className="text-sm font-semibold text-gray-400">mm / hr</span>
+            <span className="ml-auto px-2 py-0.5 rounded text-[11px] font-bold bg-amber-100 text-amber-800 border border-amber-200">
               Orange Alert
             </span>
           </div>
-          <div className="mt-3 text-xs text-slate-400">
-            24h Total: {overview.weatherSummary?.accumulated24hMm || 142} mm (Sonegaon AWS)
+          <div className="mt-2 text-xs text-gray-500">
+            24h Total: {overview.weatherSummary?.accumulated24hMm || 142} mm (Sonegaon)
           </div>
         </div>
 
-        {/* Traffic Velocity */}
-        <div className="p-5 rounded-2xl bg-navy-900/90 border border-teal-500/30 shadow-lg relative overflow-hidden group hover:border-teal-500/60 transition-all">
-          <div className="absolute top-0 right-0 w-24 h-24 bg-teal-500/10 rounded-full blur-2xl group-hover:bg-teal-500/20 transition-all" />
-          <div className="flex items-center justify-between text-slate-400 text-xs font-medium mb-3">
+        {/* Arterial Traffic */}
+        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm hover:border-amber-400 transition-all">
+          <div className="flex items-center justify-between text-gray-500 text-xs font-medium mb-2">
             <span>Arterial Velocity</span>
-            <span className="p-1.5 rounded-lg bg-teal-500/10 text-teal-400">
+            <span className="p-1.5 rounded-lg bg-purple-50 text-purple-600">
               <Car className="w-4 h-4" />
             </span>
           </div>
           <div className="flex items-baseline gap-2">
-            <span className="text-3xl font-extrabold text-teal-400 font-mono">
+            <span className="text-3xl font-extrabold text-gray-900 font-mono">
               {overview.trafficSummary?.averageSpeedKmh || 14.2}
             </span>
-            <span className="text-sm font-semibold text-slate-400">km / h</span>
-            <span className="ml-auto px-2 py-0.5 rounded text-[11px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+            <span className="text-sm font-semibold text-gray-400">km / h</span>
+            <span className="ml-auto px-2 py-0.5 rounded text-[11px] font-bold bg-red-100 text-red-800 border border-red-200">
               Gridlock
             </span>
           </div>
-          <div className="mt-3 text-xs text-slate-400">
+          <div className="mt-2 text-xs text-gray-500">
             {overview.trafficSummary?.blockedRoadsCount || 2} Subway Corridors Blocked
           </div>
         </div>
       </div>
 
-      {/* Middle Grid: Affected Locations & Department Readiness */}
+      {/* Middle Grid: Active Emergencies (Left) & High-Risk Zones + Department Readiness (Right) */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        {/* Affected Hotspots (2 Cols) */}
-        <div className="lg:col-span-2 p-5 rounded-2xl bg-navy-900 border border-slate-800 shadow-xl space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        {/* Active Emergencies (2 Cols) */}
+        <div className="lg:col-span-2 p-5 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
             <div className="flex items-center gap-2">
-              <MapPin className="w-5 h-5 text-cyan-400" />
-              <h2 className="font-bold text-slate-100 text-sm md:text-base">
-                Affected Municipal Locations (Nagpur)
+              <AlertTriangle className="w-5 h-5 text-amber-600" />
+              <h2 className="font-bold text-gray-900 text-base">
+                Active Emergencies & High-Risk Hotspots
               </h2>
             </div>
             <button
               onClick={() => onNavigate('digital-twin')}
-              className="text-xs text-cyan-400 hover:text-cyan-300 flex items-center gap-1 font-semibold"
+              className="text-xs text-amber-700 hover:text-amber-800 font-semibold flex items-center gap-1"
             >
               <span>View Map</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </button>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-            {/* Spot 1 */}
-            <div className="p-4 rounded-xl bg-navy-950/70 border border-rose-500/30 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-rose-300 flex items-center gap-1.5">
-                  <span className="w-2 h-2 rounded-full bg-rose-500 animate-ping"></span>
-                  Narendra Nagar Underpass
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded font-mono bg-rose-500/20 text-rose-300">
-                  Critical • 3.8 ft
-                </span>
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+            {overview.activeEmergencies?.map((emg) => (
+              <div
+                key={emg.id}
+                className={`p-4 rounded-xl border ${
+                  emg.severity === 'Critical'
+                    ? 'bg-red-50/60 border-red-200'
+                    : 'bg-amber-50/50 border-amber-200'
+                } space-y-1.5`}
+              >
+                <div className="flex items-center justify-between">
+                  <span className={`text-[10px] font-bold px-2 py-0.5 rounded uppercase tracking-wider ${
+                    emg.severity === 'Critical' ? 'bg-red-200 text-red-900' : 'bg-amber-200 text-amber-900'
+                  }`}>
+                    {emg.severity}
+                  </span>
+                  <span className="text-[10px] font-mono text-gray-500">
+                    {emg.division}
+                  </span>
+                </div>
+                <h3 className="font-bold text-gray-900 text-sm mt-1">{emg.title}</h3>
+                <div className="text-xs text-gray-600 flex items-center gap-1">
+                  <MapPin className="w-3.5 h-3.5 text-gray-400 shrink-0" />
+                  <span>{emg.location}</span>
+                </div>
+                <div className="text-[11px] font-semibold text-amber-800 pt-1">
+                  Status: {emg.status}
+                </div>
               </div>
-              <p className="text-xs text-slate-300">
-                Railway subway submerged; 2 passenger cars stalled. Water ingress rate exceeds sump capacity.
-              </p>
-              <div className="text-[11px] text-cyan-400 font-mono">
-                Action: Full Barricading & Ring Road Diversion
-              </div>
-            </div>
+            ))}
+          </div>
 
-            {/* Spot 2 */}
-            <div className="p-4 rounded-xl bg-navy-950/70 border border-amber-500/30 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-amber-300">
-                  Manish Nagar Flyover Subway
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded font-mono bg-amber-500/20 text-amber-300">
-                  High • 2.1 ft
-                </span>
-              </div>
-              <p className="text-xs text-slate-300">
-                Heavy silt buildup and sluggish transit. Two-wheeler skidding risk reported.
-              </p>
-              <div className="text-[11px] text-amber-400 font-mono">
-                Action: Police Escort & Traffic Slowing
-              </div>
-            </div>
-
-            {/* Spot 3 */}
-            <div className="p-4 rounded-xl bg-navy-950/70 border border-cyan-500/30 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-cyan-300">
-                  Ambazari Lake Overflow Spillway
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded font-mono bg-cyan-500/20 text-cyan-300">
-                  Monitored • 1.8 ft
-                </span>
-              </div>
-              <p className="text-xs text-slate-300">
-                Discharge conduit at 92% capacity towards Nag River. Silt grates cleared.
-              </p>
-              <div className="text-[11px] text-cyan-400 font-mono">
-                Action: NMC Irrigation Squad on Alert
-              </div>
-            </div>
-
-            {/* Spot 4 */}
-            <div className="p-4 rounded-xl bg-navy-950/70 border border-slate-700 space-y-2">
-              <div className="flex items-center justify-between">
-                <span className="text-xs font-bold text-slate-300">
-                  Sitabuldi Central Interchange
-                </span>
-                <span className="text-[10px] px-2 py-0.5 rounded font-mono bg-slate-800 text-slate-300">
-                  Moderate • 1.2 ft
-                </span>
-              </div>
-              <p className="text-xs text-slate-300">
-                Mor Bhavan bus bay entry ponding. City buses rerouting via VIP road.
-              </p>
-              <div className="text-[11px] text-teal-400 font-mono">
-                Action: Catchment Suction Tankers Deployed
-              </div>
+          {/* High Risk Zones Quick Bar */}
+          <div className="pt-2 border-t border-gray-100 space-y-2">
+            <span className="text-xs font-bold text-gray-700 uppercase tracking-wider font-mono">
+              Monitored Urban Sump Catchments
+            </span>
+            <div className="grid grid-cols-2 sm:grid-cols-4 gap-2 text-xs">
+              {overview.highRiskZones?.map((zone, i) => (
+                <div key={i} className="p-2.5 rounded-lg bg-gray-50 border border-gray-200">
+                  <div className="font-bold text-gray-900 truncate">{zone.name}</div>
+                  <div className="text-[11px] text-gray-500">{zone.type}</div>
+                  <div className="text-[11px] font-semibold text-amber-700 font-mono mt-0.5">{zone.risk}</div>
+                </div>
+              ))}
             </div>
           </div>
         </div>
 
         {/* Department Readiness Status (1 Col) */}
-        <div className="p-5 rounded-2xl bg-navy-900 border border-slate-800 shadow-xl space-y-4">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div className="p-5 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-4">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-3">
             <div className="flex items-center gap-2">
-              <ShieldCheck className="w-5 h-5 text-teal-400" />
-              <h2 className="font-bold text-slate-100 text-sm md:text-base">
+              <ShieldCheck className="w-5 h-5 text-emerald-600" />
+              <h2 className="font-bold text-gray-900 text-base">
                 Department Response Status
               </h2>
             </div>
             <button
               onClick={() => onNavigate('departments')}
-              className="text-xs text-teal-400 hover:text-teal-300 font-semibold"
+              className="text-xs text-amber-700 hover:text-amber-800 font-semibold"
             >
               Action Center
             </button>
           </div>
 
-          <div className="space-y-3 text-xs">
-            <div className="p-3 rounded-xl bg-navy-950/80 border border-cyan-500/20">
-              <div className="flex items-center justify-between text-cyan-300 font-bold mb-1">
+          <div className="space-y-2.5 text-xs">
+            <div className="p-3 rounded-xl bg-gray-50 border border-gray-200">
+              <div className="flex items-center justify-between font-bold text-gray-900 mb-0.5">
                 <span>Traffic Police (Nagpur)</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-cyan-500/20 text-cyan-300">DEPLOYED</span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-blue-100 text-blue-800 font-semibold">DEPLOYED</span>
               </div>
-              <p className="text-slate-400">
+              <p className="text-gray-600 text-[11px]">
                 {overview.departmentReadiness?.trafficPolice}
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-navy-950/80 border border-teal-500/20">
-              <div className="flex items-center justify-between text-teal-300 font-bold mb-1">
+            <div className="p-3 rounded-xl bg-gray-50 border border-gray-200">
+              <div className="flex items-center justify-between font-bold text-gray-900 mb-0.5">
                 <span>Municipal Works (NMC)</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-teal-500/20 text-teal-300">ACTIVE</span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-100 text-emerald-800 font-semibold">ACTIVE</span>
               </div>
-              <p className="text-slate-400">
+              <p className="text-gray-600 text-[11px]">
                 {overview.departmentReadiness?.municipalWorks}
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-navy-950/80 border border-amber-500/20">
-              <div className="flex items-center justify-between text-amber-300 font-bold mb-1">
+            <div className="p-3 rounded-xl bg-gray-50 border border-gray-200">
+              <div className="flex items-center justify-between font-bold text-gray-900 mb-0.5">
                 <span>Health & 108 EMS</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-amber-500/20 text-amber-300">ALERT</span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-amber-100 text-amber-800 font-semibold">ALERT</span>
               </div>
-              <p className="text-slate-400">
+              <p className="text-gray-600 text-[11px]">
                 {overview.departmentReadiness?.healthServices}
               </p>
             </div>
 
-            <div className="p-3 rounded-xl bg-navy-950/80 border border-emerald-500/20">
-              <div className="flex items-center justify-between text-emerald-300 font-bold mb-1">
+            <div className="p-3 rounded-xl bg-gray-50 border border-gray-200">
+              <div className="flex items-center justify-between font-bold text-gray-900 mb-0.5">
                 <span>Agriculture Extension</span>
-                <span className="text-[10px] px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-300">ADVISORY</span>
+                <span className="text-[10px] px-2 py-0.5 rounded bg-purple-100 text-purple-800 font-semibold">ADVISORY</span>
               </div>
-              <p className="text-slate-400">
+              <p className="text-gray-600 text-[11px]">
                 {overview.departmentReadiness?.agriculture}
               </p>
             </div>
@@ -330,26 +309,26 @@ export default function OverviewPage({ data, onNavigate, onTriggerCycle, isExecu
         </div>
       </div>
 
-      {/* Bottom Section: Pending Approval Banner & Recent Agent Feed */}
+      {/* Bottom Section: Commissioner Approval Gate Callout & Recent Activities */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
         {/* Pending Approval Callout */}
-        <div className="p-5 rounded-2xl bg-gradient-to-br from-rose-950/40 via-navy-900 to-navy-950 border border-rose-500/30 flex flex-col justify-between">
+        <div className="p-5 rounded-2xl bg-amber-50 border border-amber-300 shadow-sm flex flex-col justify-between">
           <div className="space-y-3">
-            <div className="flex items-center gap-2 text-rose-400 font-bold text-sm">
-              <AlertTriangle className="w-4 h-4" />
+            <div className="flex items-center gap-2 text-amber-900 font-bold text-sm">
+              <AlertTriangle className="w-4 h-4 text-amber-600" />
               <span>Human-in-the-Loop Approval Required</span>
             </div>
-            <h3 className="text-base font-extrabold text-white">
+            <h3 className="text-base font-extrabold text-gray-900">
               Narendra Nagar Subway Response Plan Pending
             </h3>
-            <p className="text-xs text-slate-300 leading-relaxed">
+            <p className="text-xs text-gray-700 leading-relaxed">
               Planner Agent has generated <strong>Plan A</strong> (Complete Closure & Ring Road Diversion) vs <strong>Plan B</strong> (Active Dewatering Pumping).
-              By policy, citizen alerts and emergency dispatches remain <strong>locked</strong> until Municipal Commissioner authorization.
+              Public alerts remain <strong>locked</strong> until Municipal Commissioner authorization.
             </p>
           </div>
           <button
             onClick={() => onNavigate('approvals')}
-            className="mt-4 w-full py-2.5 rounded-xl bg-rose-600 hover:bg-rose-500 text-white font-bold text-xs shadow-lg shadow-rose-950 flex items-center justify-center gap-2 transition-all"
+            className="mt-4 w-full py-2.5 rounded-xl bg-amber-500 hover:bg-amber-600 text-white font-bold text-xs shadow-sm flex items-center justify-center gap-1.5 transition-all"
           >
             <span>Review & Authorize in Commissioner Desk</span>
             <ArrowRight className="w-4 h-4" />
@@ -357,60 +336,60 @@ export default function OverviewPage({ data, onNavigate, onTriggerCycle, isExecu
         </div>
 
         {/* Recent AI Agent Feed (2 cols) */}
-        <div className="lg:col-span-2 p-5 rounded-2xl bg-navy-900 border border-slate-800 shadow-xl space-y-3">
-          <div className="flex items-center justify-between border-b border-slate-800 pb-2.5">
+        <div className="lg:col-span-2 p-5 rounded-2xl bg-white border border-gray-200 shadow-sm space-y-3">
+          <div className="flex items-center justify-between border-b border-gray-100 pb-2.5">
             <div className="flex items-center gap-2">
-              <Cpu className="w-5 h-5 text-indigo-400" />
-              <h2 className="font-bold text-slate-100 text-sm md:text-base">
-                Recent AI Agent Synchronizations
+              <Cpu className="w-5 h-5 text-amber-600" />
+              <h2 className="font-bold text-gray-900 text-base">
+                Recent AI Multi-Agent Activities
               </h2>
             </div>
             <button
               onClick={() => onNavigate('agents')}
-              className="text-xs text-indigo-400 hover:text-indigo-300 font-semibold"
+              className="text-xs text-amber-700 hover:text-amber-800 font-semibold"
             >
               Control Center (10 Agents)
             </button>
           </div>
 
-          <div className="space-y-2.5">
+          <div className="space-y-2">
             {(overview.recentAgentActivity && overview.recentAgentActivity.length > 0
               ? overview.recentAgentActivity
               : [
                   {
                     agent: 'WeatherAgent',
                     action: 'Detected 62.5 mm/hr downpour intensity over Sitabuldi and Wardha Road catchments',
-                    timestamp: new Date().toISOString()
+                    timestamp: '2026-10-31T17:28:10Z'
                   },
                   {
                     agent: 'TrafficAgent',
-                    action: 'Identified Wardha Road gridlock; calculated 18-minute detour capacity along Ring Road',
-                    timestamp: new Date().toISOString()
+                    action: 'Identified Wardha Road chokepoint; calculated 18-minute detour capacity along Ring Road',
+                    timestamp: '2026-10-31T17:22:00Z'
                   },
                   {
                     agent: 'DisasterRiskAgent',
-                    action: 'Updated Nagpur City composite risk rating to 74/100 (High Alert)',
-                    timestamp: new Date().toISOString()
+                    action: 'Updated Nagpur City composite risk rating to 74/100 (High Alert Tier)',
+                    timestamp: '2026-10-31T17:15:00Z'
                   },
                   {
                     agent: 'PlannerAgent',
                     action: 'Generated Plan A (Subway Closure) vs Plan B (Active Dewatering) simulation trade-offs',
-                    timestamp: new Date().toISOString()
+                    timestamp: '2026-10-31T17:10:00Z'
                   }
                 ]
             ).map((act, i) => (
               <div
                 key={i}
-                className="p-3 rounded-xl bg-navy-950/60 border border-slate-800 flex items-start justify-between gap-3 text-xs"
+                className="p-3 rounded-xl bg-gray-50 border border-gray-200 flex items-start justify-between gap-3 text-xs"
               >
                 <div className="flex items-start gap-2.5">
-                  <div className="w-2 h-2 rounded-full bg-cyan-400 mt-1.5 shrink-0" />
+                  <div className="w-2 h-2 rounded-full bg-amber-500 mt-1.5 shrink-0" />
                   <div>
-                    <span className="font-bold text-cyan-300 mr-2">{act.agent}:</span>
-                    <span className="text-slate-300">{act.action}</span>
+                    <span className="font-bold text-gray-900 mr-1.5">{act.agent}:</span>
+                    <span className="text-gray-700">{act.action}</span>
                   </div>
                 </div>
-                <span className="text-[10px] text-slate-500 font-mono shrink-0">
+                <span className="text-[10px] text-gray-400 font-mono shrink-0">
                   {act.timestamp ? new Date(act.timestamp).toLocaleTimeString() : 'Just now'}
                 </span>
               </div>

@@ -3,130 +3,163 @@ import {
   LayoutDashboard,
   Radio,
   Cpu,
+  Building,
+  Wheat,
   GitCompare,
   Building2,
-  Wheat,
   Stamp,
+  HeartHandshake,
   ScrollText,
   AlertTriangle,
   ChevronRight
 } from 'lucide-react';
 
-export default function Sidebar({ activeTab, onSelectTab, counts = {} }) {
-  const navItems = [
+export default function Sidebar({ activeTab, onSelectTab, counts = {}, activeDivision }) {
+  const allNavItems = [
     {
       id: 'overview',
-      name: 'City Overview',
+      name: '1. City Overview',
+      division: 'ALL',
       icon: LayoutDashboard,
       badge: 'Nagpur',
-      badgeColor: 'bg-cyan-500/10 text-cyan-400 border-cyan-500/20'
+      badgeColor: 'bg-amber-100 text-amber-800 border-amber-200'
     },
     {
       id: 'signals',
-      name: 'Live Signals',
+      name: '2. Live Signals',
+      division: 'ALL',
       icon: Radio,
-      badge: '3 Feeds',
-      badgeColor: 'bg-teal-500/10 text-teal-400 border-teal-500/20'
+      badge: '3 Sources',
+      badgeColor: 'bg-blue-50 text-blue-700 border-blue-200'
     },
     {
       id: 'agents',
-      name: 'AI Agent Control Center',
+      name: '3. AI Agent Control Center',
+      division: 'ALL',
       icon: Cpu,
-      badge: '10 Agents',
-      badgeColor: 'bg-indigo-500/10 text-indigo-400 border-indigo-500/20'
+      badge: '10 Swarm',
+      badgeColor: 'bg-purple-50 text-purple-700 border-purple-200'
+    },
+    {
+      id: 'urban',
+      name: '4. Urban Control Room',
+      division: 'URBAN',
+      icon: Building,
+      badge: 'Nagpur HQ',
+      badgeColor: 'bg-amber-100 text-amber-800 border-amber-300'
+    },
+    {
+      id: 'rural',
+      name: '5. Rural Intelligence',
+      division: 'RURAL',
+      icon: Wheat,
+      badge: '10 Districts',
+      badgeColor: 'bg-emerald-50 text-emerald-800 border-emerald-200'
     },
     {
       id: 'digital-twin',
-      name: 'AI Planner & Digital Twin',
+      name: '6. AI Planner & Digital Twin',
+      division: 'URBAN',
       icon: GitCompare,
       badge: 'Plan A/B',
-      badgeColor: 'bg-amber-500/10 text-amber-400 border-amber-500/20'
+      badgeColor: 'bg-amber-50 text-amber-800 border-amber-200'
     },
     {
       id: 'departments',
-      name: 'Department Action Center',
+      name: '7. Department Action Center',
+      division: 'ALL',
       icon: Building2,
-      badge: counts.tasks ? `${counts.tasks} Tasks` : '4 Depts',
-      badgeColor: 'bg-blue-500/10 text-blue-400 border-blue-500/20'
-    },
-    {
-      id: 'farmer',
-      name: 'Farmer Protection',
-      icon: Wheat,
-      badge: 'Maharashtra',
-      badgeColor: 'bg-emerald-500/10 text-emerald-400 border-emerald-500/20'
+      badge: counts.tasks ? `${counts.tasks} Tasks` : '5 Depts',
+      badgeColor: 'bg-indigo-50 text-indigo-700 border-indigo-200'
     },
     {
       id: 'approvals',
-      name: 'Commissioner & Alerts',
+      name: '8. Commissioner & Alerts',
+      division: 'URBAN',
       icon: Stamp,
-      badge: counts.pendingApproval ? 'Pending Sign-off' : 'Enforced Gate',
-      badgeColor: counts.pendingApproval ? 'bg-rose-500/20 text-rose-300 border-rose-500/30 animate-pulse' : 'bg-slate-700 text-slate-300 border-slate-600'
+      badge: counts.pendingApproval ? 'Sign-Off Req' : 'Locked Gate',
+      badgeColor: counts.pendingApproval ? 'bg-rose-100 text-rose-800 border-rose-300 font-bold' : 'bg-gray-100 text-gray-700 border-gray-200'
+    },
+    {
+      id: 'farmer',
+      name: '9. Farmer Protection',
+      division: 'RURAL',
+      icon: HeartHandshake,
+      badge: 'PMFBY 72h',
+      badgeColor: 'bg-emerald-50 text-emerald-700 border-emerald-200'
     },
     {
       id: 'audit',
-      name: 'Activity & Audit Logs',
+      name: '10. Activity & Audit Logs',
+      division: 'ALL',
       icon: ScrollText,
-      badge: 'Immutable',
-      badgeColor: 'bg-slate-800 text-slate-400 border-slate-700'
+      badge: 'Audit Trail',
+      badgeColor: 'bg-gray-100 text-gray-700 border-gray-200'
     }
   ];
 
+  // Filter items if user selected specific division
+  const filteredNavItems = allNavItems.filter(item => {
+    if (!activeDivision || activeDivision === 'ALL') return true;
+    if (item.division === 'ALL') return true;
+    return item.division === activeDivision;
+  });
+
   return (
-    <aside className="w-full lg:w-72 bg-navy-900 border-r border-slate-800/80 flex flex-col shrink-0">
-      {/* City Status Badge */}
-      <div className="p-4 border-b border-slate-800/80">
-        <div className="p-3 rounded-xl bg-gradient-to-br from-navy-950 to-navy-850 border border-cyan-500/20 flex items-center justify-between">
+    <aside className="w-full lg:w-72 bg-white border-r border-gray-200 flex flex-col shrink-0 shadow-sm">
+      {/* City Status Badge Card */}
+      <div className="p-3.5 border-b border-gray-200">
+        <div className="p-3 rounded-xl bg-amber-50/70 border border-amber-200 flex items-center justify-between">
           <div className="flex items-center gap-2.5">
-            <div className="p-2 rounded-lg bg-rose-500/10 border border-rose-500/30 text-rose-400">
-              <AlertTriangle className="w-4 h-4 animate-bounce" />
+            <div className="p-2 rounded-lg bg-amber-500 text-white">
+              <AlertTriangle className="w-4 h-4" />
             </div>
             <div>
-              <div className="text-xs font-semibold text-slate-200">Nagpur Monsoon Alert</div>
-              <div className="text-[11px] text-rose-400 font-mono">Orange Warning Active</div>
+              <div className="text-xs font-bold text-gray-900">Nagpur Monsoon Alert</div>
+              <div className="text-[11px] text-amber-800 font-semibold">Orange Warning Active</div>
             </div>
           </div>
-          <span className="text-xs px-2 py-0.5 rounded bg-rose-500/20 text-rose-300 font-bold">
+          <span className="text-xs px-2.5 py-1 rounded-md bg-white border border-amber-300 text-amber-900 font-extrabold font-mono shadow-xs">
             74/100
           </span>
         </div>
       </div>
 
       {/* Navigation list */}
-      <nav className="p-3 space-y-1.5 flex-1 overflow-y-auto">
-        <div className="px-3 py-1 text-[11px] font-bold uppercase tracking-wider text-slate-500 font-mono">
-          Command Operations
+      <nav className="p-3 space-y-1 flex-1 overflow-y-auto">
+        <div className="px-3 py-1.5 text-[11px] font-bold uppercase tracking-wider text-gray-400 font-mono">
+          Command Modules
         </div>
-        {navItems.map((item) => {
+        {filteredNavItems.map((item) => {
           const Icon = item.icon;
           const isActive = activeTab === item.id;
           return (
             <button
               key={item.id}
               onClick={() => onSelectTab(item.id)}
-              className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs font-medium transition-all group ${
+              className={`w-full flex items-center justify-between p-2.5 rounded-xl text-xs transition-all group ${
                 isActive
-                  ? 'bg-gradient-to-r from-cyan-500/20 via-cyan-500/10 to-transparent text-cyan-300 border-l-4 border-cyan-400 shadow-lg shadow-cyan-950/50'
-                  : 'text-slate-400 hover:text-slate-100 hover:bg-navy-800/60'
+                  ? 'bg-amber-50 text-amber-900 font-bold border-l-4 border-amber-500 shadow-xs'
+                  : 'text-gray-600 hover:text-gray-900 hover:bg-gray-50 font-medium'
               }`}
             >
-              <div className="flex items-center gap-3 truncate">
+              <div className="flex items-center gap-2.5 truncate">
                 <Icon
                   className={`w-4 h-4 shrink-0 transition-colors ${
-                    isActive ? 'text-cyan-400' : 'text-slate-500 group-hover:text-slate-300'
+                    isActive ? 'text-amber-600' : 'text-gray-400 group-hover:text-gray-600'
                   }`}
                 />
                 <span className="truncate">{item.name}</span>
               </div>
               <div className="flex items-center gap-1.5 shrink-0">
                 <span
-                  className={`text-[10px] font-mono px-2 py-0.5 rounded-full border ${item.badgeColor}`}
+                  className={`text-[10px] font-mono px-2 py-0.5 rounded border ${item.badgeColor}`}
                 >
                   {item.badge}
                 </span>
                 <ChevronRight
                   className={`w-3.5 h-3.5 transition-transform ${
-                    isActive ? 'text-cyan-400 translate-x-0.5' : 'text-slate-600 opacity-0 group-hover:opacity-100'
+                    isActive ? 'text-amber-600 translate-x-0.5' : 'text-gray-300 opacity-0 group-hover:opacity-100'
                   }`}
                 />
               </div>
@@ -136,14 +169,14 @@ export default function Sidebar({ activeTab, onSelectTab, counts = {} }) {
       </nav>
 
       {/* Footer system specs */}
-      <div className="p-4 border-t border-slate-800/80 text-[11px] text-slate-500 font-mono">
-        <div className="flex items-center justify-between text-slate-400 mb-1">
+      <div className="p-3.5 border-t border-gray-200 text-[11px] text-gray-500 font-mono bg-gray-50">
+        <div className="flex items-center justify-between text-gray-700 mb-1">
           <span>Engine Status</span>
-          <span className="text-teal-400">ONLINE</span>
+          <span className="text-emerald-700 font-bold">ONLINE (10 Swarm)</span>
         </div>
         <div className="flex items-center justify-between">
-          <span>Simulation Model</span>
-          <span className="text-cyan-400">NMC-v1.0</span>
+          <span>Primary Division</span>
+          <span className="text-amber-800 font-bold">NMC Urban + Maha Rural</span>
         </div>
       </div>
     </aside>

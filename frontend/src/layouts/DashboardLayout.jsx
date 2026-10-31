@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React from 'react';
 import Header from '../components/Header';
 import Sidebar from '../components/Sidebar';
 import Toast from '../components/Toast';
@@ -11,17 +11,29 @@ export default function DashboardLayout({
   isRefreshing,
   toast,
   onCloseToast,
-  counts
+  counts,
+  activeDivision,
+  onSelectDivision
 }) {
   return (
-    <div className="min-h-screen flex flex-col bg-navy-950 text-slate-100 font-sans">
+    <div className="min-h-screen flex flex-col bg-[#F3F4F6] text-gray-800 font-sans">
       {/* Top Header */}
-      <Header onGlobalRefresh={onGlobalRefresh} isRefreshing={isRefreshing} />
+      <Header
+        onGlobalRefresh={onGlobalRefresh}
+        isRefreshing={isRefreshing}
+        activeDivision={activeDivision}
+        onSelectDivision={onSelectDivision}
+      />
 
       {/* Main body area: Sidebar + Page content */}
       <div className="flex-1 flex flex-col lg:flex-row overflow-hidden">
         {/* Sidebar */}
-        <Sidebar activeTab={activeTab} onSelectTab={onSelectTab} counts={counts} />
+        <Sidebar
+          activeTab={activeTab}
+          onSelectTab={onSelectTab}
+          counts={counts}
+          activeDivision={activeDivision}
+        />
 
         {/* Dynamic Page Content */}
         <main className="flex-1 p-4 lg:p-6 overflow-y-auto max-h-[calc(100vh-65px)]">
