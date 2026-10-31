@@ -1,0 +1,58 @@
+@import "leaflet/dist/leaflet.css";
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  body {
+    @apply bg-navy-950 text-slate-100 font-sans antialiased selection:bg-cyan-500 selection:text-white min-h-screen overflow-x-hidden;
+  }
+}
+
+/* Custom Sleek Scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0a1128;
+}
+::-webkit-scrollbar-thumb {
+  background: #1c2859;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #06b6d4;
+}
+
+/* Leaflet dark styling */
+.leaflet-container {
+  width: 100%;
+  height: 100%;
+  border-radius: 0.75rem;
+  background-color: #0b132b !important;
+}
+
+.leaflet-popup-content-wrapper {
+  background: #0f1738 !important;
+  color: #f1f5f9 !important;
+  border: 1px solid #06b6d4 !important;
+  border-radius: 8px !important;
+  box-shadow: 0 10px 25px -5px rgba(6, 182, 212, 0.25) !important;
+}
+
+.leaflet-popup-tip {
+  background: #0f1738 !important;
+}
+
+/* Pulse animation for hazard alerts */
+@keyframes beacon-pulse {
+  0% { transform: scale(0.95); opacity: 0.8; }
+  50% { transform: scale(1.15); opacity: 0.3; }
+  100% { transform: scale(0.95); opacity: 0.8; }
+}
+
+.animate-beacon {
+  animation: beacon-pulse 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
